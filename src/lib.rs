@@ -144,6 +144,10 @@ impl epi::App for App {
     fn name(&self) -> &str {
         "Pathypath"
     }
+    
+    fn max_size_points(&self) -> Vec2 {
+        Vec2::new(f32::INFINITY, f32::INFINITY)
+    }
 
     fn update(&mut self, ctx: &CtxRef, _frame: &mut epi::Frame<'_>) {
         CentralPanel::default().show(ctx, |ui| {
