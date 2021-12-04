@@ -1,0 +1,27 @@
+{
+  "name": "pathypath",
+  "version": "0.1.0",
+  "description": "Pathypath is a path finding algorithm visualizor.",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --config webpack.config.js",
+    "start": "webpack-dev-server"
+  },
+  "keywords": [
+    "webassembly",
+    "wasm",
+    "rust",
+    "webpack"
+  ],
+  "author": "Selyatin Ismet <selyatinismet@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "pathypath": "file:../pkg"
+  },
+  "devDependencies": {
+    "copy-webpack-plugin": "^5.0.0",
+    "webpack": "^4.29.3",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.6.0"
+  }
+}
