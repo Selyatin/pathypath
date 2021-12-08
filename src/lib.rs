@@ -1,11 +1,8 @@
 #![warn(clippy::all)]
 
 use eframe::{egui::*, epi};
-use std::{
-    collections::VecDeque,
-    ops::{Add, Sub},
-};
 use rustc_hash::FxHashMap;
+use std::collections::VecDeque;
 
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
@@ -80,17 +77,17 @@ impl App {
             };
 
             let neighbors = [
-                (parent_row.add(1), parent_column),
-                (parent_row.sub(1), parent_column),
-                (parent_row, parent_column.add(1)),
-                (parent_row, parent_column.sub(1)),
+                (parent_row.wrapping_add(1), parent_column),
+                (parent_row.wrapping_sub(1), parent_column),
+                (parent_row, parent_column.wrapping_add(1)),
+                (parent_row, parent_column.wrapping_sub(1)),
             ];
 
             for (row, column) in neighbors {
-                if column >= width {
+                if column > width {
                     continue;
                 }
-                let index = row * width + column;
+                let index = row.wrapping_mul(width).wrapping_add(column);
                 let cell = match self.grid.get_mut(index) {
                     Some(cell) => cell,
                     None => continue,
@@ -100,12 +97,14 @@ impl App {
                     Cell::Visited => continue,
                     Cell::Empty => {
                         self.queue.push_front((row, column));
-                        self.parent_cells.insert((row, column), (parent_row, parent_column));
+                        self.parent_cells
+                            .insert((row, column), (parent_row, parent_column));
                         *cell = Cell::Visited
                     }
                     Cell::End => {
                         self.traceback_pos = Some((row, column));
-                        self.parent_cells.insert((row, column), (parent_row, parent_column));
+                        self.parent_cells
+                            .insert((row, column), (parent_row, parent_column));
                         self.searching = false;
                         self.drawing_shortest_path = true;
                         return;
@@ -116,13 +115,13 @@ impl App {
         }
     }
 
-    fn shortest_path(&mut self, width: usize){
+    fn shortest_path(&mut self, width: usize) {
         for _ in 0..self.speed {
             let pos = self.traceback_pos.unwrap();
             // Row and Column of Parent cell.
-            let (row, column) = match self.parent_cells.remove(&pos){
+            let (row, column) = match self.parent_cells.remove(&pos) {
                 Some(tuple) => tuple,
-                None => return
+                None => return,
             };
             // In the next iteration get current parent cell's parent cell.
             self.traceback_pos = Some((row, column));
@@ -133,8 +132,8 @@ impl App {
                     self.traceback_pos = None;
                     self.parent_cells.clear();
                     return;
-                },
-                _ => self.grid[index] = Cell::Path
+                }
+                _ => self.grid[index] = Cell::Path,
             };
         }
     }
@@ -144,7 +143,7 @@ impl epi::App for App {
     fn name(&self) -> &str {
         "Pathypath"
     }
-    
+
     fn max_size_points(&self) -> Vec2 {
         Vec2::new(f32::INFINITY, f32::INFINITY)
     }
@@ -276,7 +275,7 @@ impl epi::App for App {
                 ui.radio_value(&mut self.selected_cell_type, Cell::Empty, "Empty");
                 if ui.button("Search").clicked() && self.start_pos.is_some() && self.end_exists {
                     for cell in &mut self.grid {
-                        if *cell == Cell::Visited || *cell == Cell::Path{
+                        if *cell == Cell::Visited || *cell == Cell::Path {
                             *cell = Cell::Empty;
                         }
                     }
